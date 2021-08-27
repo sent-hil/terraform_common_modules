@@ -208,7 +208,7 @@ resource "aws_elastic_beanstalk_environment" "default" {
   setting {
     namespace = "aws:elasticbeanstalk:cloudwatch:logs"
     name      = "RetentionInDays"
-    value     = "7"
+    value     = "365"
   }
   setting {
     namespace = "aws:elasticbeanstalk:cloudwatch:logs"
