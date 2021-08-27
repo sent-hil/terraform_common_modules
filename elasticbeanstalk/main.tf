@@ -71,7 +71,7 @@ resource "aws_s3_bucket" "default" {
 
 resource "aws_s3_bucket_object" "default" {
   bucket = aws_s3_bucket.default.id
-  key    = "${local.project_with_env}/${var.app_version}"
+  key    = var.app_version
   source = "${var.app_path}/${var.app_version}"
 }
 
@@ -86,28 +86,87 @@ resource "aws_elastic_beanstalk_application_version" "default" {
 }
 
 resource "aws_iam_instance_profile" "beanstalk_service_profile" {
-  name = "beanstalk_service_user"
+  name = "${var.project}_beanstalk_service_user"
   role = aws_iam_role.beanstalk_service_role.name
 }
 
 resource "aws_iam_role" "beanstalk_service_role" {
-  name               = "beanstalk_service_role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
+  name = "${var.project}_beanstalk_service_role"
+  assume_role_policy = jsonencode(
     {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
+      Statement = [
+        {
+          Action = "sts:AssumeRole"
+          Effect = "Allow",
+          Principal = {
+            Service = "ec2.amazonaws.com"
+          }
+        }
+      ]
+      Version = "2008-10-17"
     }
-  ]
-}
-EOF
-}
+  )
 
+  inline_policy {
+    name = "my_inline_policy"
+    policy = jsonencode(
+      {
+        Statement = [
+          {
+            Action = [
+              "s3:Get*",
+              "s3:List*",
+              "s3:PutObject",
+            ]
+            Effect = "Allow"
+            Resource = [
+              "arn:aws:s3:::elasticbeanstalk-*",
+              "arn:aws:s3:::elasticbeanstalk-*/*",
+            ]
+            Sid = "BucketAccess"
+          },
+          {
+            Action = [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries",
+            ]
+            Effect   = "Allow"
+            Resource = "*"
+            Sid      = "XRayAccess"
+          },
+          {
+            Action = [
+              "logs:PutLogEvents",
+              "logs:CreateLogStream",
+              "logs:DescribeLogStreams",
+              "logs:DescribeLogGroups",
+            ]
+            Effect = "Allow"
+            Resource = [
+              "arn:aws:logs:*:*:log-group:/aws/elasticbeanstalk*",
+            ]
+            Sid = "CloudWatchLogsAccess"
+          },
+          {
+            Action = [
+              "elasticbeanstalk:PutInstanceStatistics",
+            ]
+            Effect = "Allow"
+            Resource = [
+              "arn:aws:elasticbeanstalk:*:*:application/*",
+              "arn:aws:elasticbeanstalk:*:*:environment/*",
+            ]
+            Sid = "ElasticBeanstalkHealthAccess"
+          },
+        ]
+        Version = "2012-10-17"
+      }
+    )
+  }
+}
 
 resource "aws_elastic_beanstalk_application" "default" {
   name = var.project
@@ -121,10 +180,11 @@ resource "aws_elastic_beanstalk_application" "default" {
 }
 
 resource "aws_elastic_beanstalk_environment" "default" {
-  application   = aws_elastic_beanstalk_application.default.name
-  version_label = aws_elastic_beanstalk_application_version.default.id
+  application            = aws_elastic_beanstalk_application.default.name
+  version_label          = aws_elastic_beanstalk_application_version.default.id
+  wait_for_ready_timeout = "5m"
 
-  name         = var.project
+  name         = var.project_env
   cname_prefix = local.project_with_env
 
   solution_stack_name = var.eb_solution_stack_name
@@ -139,6 +199,21 @@ resource "aws_elastic_beanstalk_environment" "default" {
     namespace = "aws:ec2:vpc"
     name      = "Subnets"
     value     = var.vpc_public_subnet.id
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "AssociatePublicIpAddress"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "RetentionInDays"
+    value     = "7"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "StreamLogs"
+    value     = "true"
   }
   setting {
     name      = "EC2KeyName"
