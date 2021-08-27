@@ -1,6 +1,13 @@
 provider "aws" {
   profile = var.aws_profile_name
   region  = var.aws_region
+
+  default_tags {
+    tags = {
+      Project   = "${var.project}"
+      Terraform = true
+    }
+  }
 }
 
 # -----------------------------------------------------------------------------
@@ -13,11 +20,6 @@ resource "aws_db_subnet_group" "maindb_subnet_group" {
     var.private_subnet_id_1,
     var.private_subnet_id_2
   ]
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 #a d -----------------------------------------------------------------------------
@@ -36,11 +38,6 @@ resource "aws_db_instance" "maindb" {
   vpc_security_group_ids = [
     aws_security_group.db_vpc_only.id
   ]
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 # -----------------------------------------------------------------------------
@@ -59,10 +56,5 @@ resource "aws_security_group" "db_vpc_only" {
     cidr_blocks = [
       var.vpc_public_subnet_cidr_block
     ]
-  }
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
   }
 }

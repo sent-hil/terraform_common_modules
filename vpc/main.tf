@@ -1,6 +1,13 @@
 provider "aws" {
   profile = var.aws_profile_name
   region  = var.aws_region
+
+  default_tags {
+    tags = {
+      Project   = "${var.project}"
+      Terraform = true
+    }
+  }
 }
 
 # -----------------------------------------------------------------------------
@@ -10,11 +17,6 @@ resource "aws_vpc" "vpc" {
   cidr_block           = "10.0.0.0/16" # 65,536 IP addresses
   enable_dns_hostnames = true
   enable_dns_support   = true
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 # -----------------------------------------------------------------------------
@@ -29,9 +31,7 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = "${var.aws_region}${count.index == 0 ? "b" : "a"}"
 
   tags = {
-    Name      = "${var.project} private subnet ${count.index + 1}"
-    Project   = "${var.project}"
-    Terraform = true
+    Name = "${var.project} private subnet ${count.index + 1}"
   }
 }
 
@@ -46,9 +46,7 @@ resource "aws_subnet" "public_subnet" {
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name      = "${var.project} public subnet 1"
-    Project   = "${var.project}"
-    Terraform = true
+    Name = "${var.project} public subnet 1"
   }
 }
 
@@ -59,9 +57,7 @@ resource "aws_internet_gateway" "ig" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name      = "${var.project} internet gateway 1"
-    Project   = "${var.project}"
-    Terraform = true
+    Name = "${var.project} internet gateway 1"
   }
 }
 
@@ -74,9 +70,7 @@ resource "aws_route_table" "public_route_1" {
   }
 
   tags = {
-    Name      = "${var.project} public route to internet"
-    Project   = "${var.project}"
-    Terraform = true
+    Name = "${var.project} public route to internet"
   }
 }
 

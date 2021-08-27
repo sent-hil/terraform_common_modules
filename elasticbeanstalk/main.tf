@@ -1,6 +1,13 @@
 provider "aws" {
   profile = var.aws_profile_name
   region  = var.aws_region
+
+  default_tags {
+    tags = {
+      Project   = "${var.project}"
+      Terraform = true
+    }
+  }
 }
 
 locals {
@@ -33,9 +40,7 @@ resource "aws_security_group" "allow_inbound_http" {
   }
 
   tags = {
-    Name      = "Allow HTTP/HTTPS inbound traffic"
-    Project   = "${var.project}"
-    Terraform = true
+    Name = "Allow HTTP/HTTPS inbound traffic"
   }
 }
 
@@ -54,11 +59,6 @@ resource "aws_key_pair" "default" {
   provisioner "local-exec" {
     command = "echo '${tls_private_key.default.private_key_pem}' > ./${local.ssh_key_name}.pem && chmod 400 ./${local.ssh_key_name}.pem"
   }
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 # -----------------------------------------------------------------------------
@@ -73,11 +73,6 @@ resource "aws_s3_bucket_object" "default" {
   bucket = aws_s3_bucket.default.id
   key    = "${local.project_with_env}/${var.app_version}"
   source = "${var.app_path}/${var.app_version}"
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 # -----------------------------------------------------------------------------
@@ -88,21 +83,11 @@ resource "aws_elastic_beanstalk_application_version" "default" {
   bucket      = aws_s3_bucket.default.id
   key         = aws_s3_bucket_object.default.id
   name        = var.app_version
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 resource "aws_iam_instance_profile" "beanstalk_service_profile" {
   name = "beanstalk_service_user"
   role = aws_iam_role.beanstalk_service_role.name
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 resource "aws_iam_role" "beanstalk_service_role" {
@@ -121,11 +106,6 @@ resource "aws_iam_role" "beanstalk_service_role" {
   ]
 }
 EOF
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
-  }
 }
 
 
@@ -137,11 +117,6 @@ resource "aws_elastic_beanstalk_application" "default" {
     service_role          = aws_iam_role.beanstalk_service_role.arn
     max_count             = 128
     delete_source_from_s3 = true
-  }
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
   }
 }
 
@@ -199,10 +174,5 @@ resource "aws_elastic_beanstalk_environment" "default" {
     name      = "IamInstanceProfile"
     namespace = "aws:autoscaling:launchconfiguration"
     value     = aws_iam_instance_profile.beanstalk_service_profile.name
-  }
-
-  tags = {
-    Project   = "${var.project}"
-    Terraform = true
   }
 }
