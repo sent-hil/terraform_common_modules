@@ -14,7 +14,7 @@ variable "project" {
 
 variable "project_env" {
   description = "production|staging etc."
-  default = "staging"
+  default     = "staging"
 }
 
 variable "app_version" {
@@ -29,7 +29,7 @@ variable "app_path" {
 // $ aws elasticbeanstalk list-available-solution-stacks
 variable "eb_solution_stack_name" {
   description = "EB Solution Stack."
-  default = "64bit Amazon Linux 2 v3.4.4 running Docker"
+  default     = "64bit Amazon Linux 2 v3.4.4 running Docker"
 }
 
 variable "eb_instance_type" {

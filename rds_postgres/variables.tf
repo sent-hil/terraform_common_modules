@@ -14,7 +14,7 @@ variable "project" {
 
 variable "rds_database_port" {
   description = "Port of database."
-  default = 5432
+  default     = 5432
 }
 
 variable "rds_database_name" {
@@ -28,7 +28,7 @@ variable "rds_database_password" {
 
 variable "rds_allocated_storage" {
   description = "GB of disk space."
-  default = 100
+  default     = 100
 }
 
 variable "rds_instance_class" {

@@ -10,8 +10,10 @@ resource "aws_vpc" "vpc" {
   cidr_block           = "10.0.0.0/16" # 65,536 IP addresses
   enable_dns_hostnames = true
   enable_dns_support   = true
+
   tags = {
-    Name = "${var.project}"
+    Project   = "${var.project}"
+    Terraform = true
   }
 }
 
@@ -19,15 +21,17 @@ resource "aws_vpc" "vpc" {
 # 2 private subnets for RDS.
 # -----------------------------------------------------------------------------
 resource "aws_subnet" "private_subnet" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.${count.index+1}.0/24" # 251 IP addresses
-  count             = 2
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = "10.0.${count.index + 1}.0/24" # 251 IP addresses
+  count      = 2
 
   # RDS requires you have 2 diff. availability zones.
   availability_zone = "${var.aws_region}${count.index == 0 ? "b" : "a"}"
 
   tags = {
-    Name = "${var.project} private subnet ${count.index+1}"
+    Name      = "${var.project} private subnet ${count.index + 1}"
+    Project   = "${var.project}"
+    Terraform = true
   }
 }
 
@@ -35,14 +39,16 @@ resource "aws_subnet" "private_subnet" {
 # 1 public subnet
 # -----------------------------------------------------------------------------
 resource "aws_subnet" "public_subnet" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.3.0/24" # 251 IP addresses
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = "10.0.3.0/24" # 251 IP addresses
 
   # TODO: does this matter which availability zone this is in?
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "${var.project} public subnet 1"
+    Name      = "${var.project} public subnet 1"
+    Project   = "${var.project}"
+    Terraform = true
   }
 }
 
@@ -53,7 +59,9 @@ resource "aws_internet_gateway" "ig" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "${var.project} internet gateway 1"
+    Name      = "${var.project} internet gateway 1"
+    Project   = "${var.project}"
+    Terraform = true
   }
 }
 
@@ -66,7 +74,9 @@ resource "aws_route_table" "public_route_1" {
   }
 
   tags = {
-    Name = "${var.project} public route to internet"
+    Name      = "${var.project} public route to internet"
+    Project   = "${var.project}"
+    Terraform = true
   }
 }
 

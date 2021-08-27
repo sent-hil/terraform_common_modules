@@ -9,31 +9,37 @@ provider "aws" {
 resource "aws_db_subnet_group" "maindb_subnet_group" {
   name        = "db_subnets_group"
   description = "${var.project} vpc"
-  subnet_ids  = [
+  subnet_ids = [
     var.private_subnet_id_1,
     var.private_subnet_id_2
   ]
+
+  tags = {
+    Project   = "${var.project}"
+    Terraform = true
+  }
 }
 
 # -----------------------------------------------------------------------------
 # Postgres RDS instance in private subnet.
 # -----------------------------------------------------------------------------
 resource "aws_db_instance" "maindb" {
-  allocated_storage     = var.rds_allocated_storage
-  engine                = "postgres"
-  instance_class        = var.rds_instance_class
-  identifier            = var.rds_database_name
-  name                  = var.rds_database_name
-  username              = var.rds_database_username
-  password              = var.rds_database_password
-  db_subnet_group_name  = aws_db_subnet_group.maindb_subnet_group.name
+  allocated_storage    = var.rds_allocated_storage
+  engine               = "postgres"
+  instance_class       = var.rds_instance_class
+  identifier           = var.rds_database_name
+  name                 = var.rds_database_name
+  username             = var.rds_database_username
+  password             = var.rds_database_password
+  db_subnet_group_name = aws_db_subnet_group.maindb_subnet_group.name
 
   vpc_security_group_ids = [
     aws_security_group.db_vpc_only.id
   ]
 
-  tags  = {
-    Name = "main"
+  tags = {
+    Project   = "${var.project}"
+    Terraform = true
   }
 }
 
@@ -53,5 +59,10 @@ resource "aws_security_group" "db_vpc_only" {
     cidr_blocks = [
       var.vpc_public_subnet_cidr_block
     ]
+  }
+
+  tags = {
+    Project   = "${var.project}"
+    Terraform = true
   }
 }
