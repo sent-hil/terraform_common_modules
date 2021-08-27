@@ -43,15 +43,15 @@ resource "aws_db_instance" "maindb" {
 resource "aws_security_group" "db_vpc_only" {
   vpc_id      = var.vpc_id
   name        = "db_vpc_only"
-  description = "Allow internal VPC connections"
+  description = "Allow internal VPC connections."
 
   ingress {
-    description = "5432 from private subnets"
+    description = "5432 from VPC public subnet."
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
     cidr_blocks = [
-      var.public_subnet_cidr_block
+      var.vpc_public_subnet_cidr_block
     ]
   }
 }
