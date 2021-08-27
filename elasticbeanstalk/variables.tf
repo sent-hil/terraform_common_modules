@@ -28,7 +28,7 @@ variable "app_path" {
 // Get list from:
 // $ aws elasticbeanstalk list-available-solution-stacks
 variable "eb_solution_stack_name" {
-  description "EB Solution Stack."
+  description = "EB Solution Stack."
   default = "64bit Amazon Linux 2 v3.4.4 running Docker"
 }
 

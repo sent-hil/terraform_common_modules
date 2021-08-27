@@ -17,7 +17,6 @@ module "rds_postgres" {
   rds_database_username = var.rds_database_username
   rds_database_password = var.rds_database_password
   rds_allocated_storage = var.rds_allocated_storage
-  rds_database_engine_version = var.rds_database_engine_version
   rds_database_port = var.rds_database_port
   rds_instance_class = var.rds_instance_class
 

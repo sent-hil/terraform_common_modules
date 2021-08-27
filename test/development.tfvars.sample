@@ -1,0 +1,14 @@
+aws_profile_name = "default"
+aws_region = "us-east-1"
+project = ""
+project_env = "staging"
+
+rds_database_port = 5432
+rds_database_name = "maindb"
+rds_database_username = ""
+rds_database_password = ""
+rds_allocated_storage = 100
+rds_instance_class = "db.t2.micro"
+
+app_version = ".zip"
+app_path = "../"
