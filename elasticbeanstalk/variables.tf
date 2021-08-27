@@ -43,3 +43,7 @@ variable "vpc_id" {
 variable "vpc_public_subnet" {
   description = "VPC subnet to which EB app will be deployed."
 }
+
+variable "settings" {
+  default = {}
+}

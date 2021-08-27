@@ -108,7 +108,7 @@ resource "aws_iam_role" "beanstalk_service_role" {
   )
 
   inline_policy {
-    name = "my_inline_policy"
+    name = "elasticbeanstalk"
     policy = jsonencode(
       {
         Statement = [
@@ -160,7 +160,7 @@ resource "aws_iam_role" "beanstalk_service_role" {
               "arn:aws:elasticbeanstalk:*:*:environment/*",
             ]
             Sid = "ElasticBeanstalkHealthAccess"
-          },
+          }
         ]
         Version = "2012-10-17"
       }
@@ -249,5 +249,14 @@ resource "aws_elastic_beanstalk_environment" "default" {
     name      = "IamInstanceProfile"
     namespace = "aws:autoscaling:launchconfiguration"
     value     = aws_iam_instance_profile.beanstalk_service_profile.name
+  }
+
+  dynamic "setting" {
+    for_each = var.settings
+    content {
+      namespace = "aws:elasticbeanstalk:application:environment"
+      name = setting.value["name"]
+      value = setting.value["value"]
+    }
   }
 }
