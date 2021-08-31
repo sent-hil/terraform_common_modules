@@ -14,7 +14,7 @@ provider "aws" {
 # Subnet group for private subnets
 # -----------------------------------------------------------------------------
 resource "aws_db_subnet_group" "maindb_subnet_group" {
-  name        = "db_subnets_group"
+  name        = "${var.project}_subnets_group"
   description = "${var.project} vpc"
   subnet_ids = [
     var.private_subnet_id_1,
