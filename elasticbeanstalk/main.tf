@@ -4,7 +4,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project   = "${var.project}"
+      Project   = var.project
       Terraform = true
     }
   }
@@ -255,8 +255,8 @@ resource "aws_elastic_beanstalk_environment" "default" {
     for_each = var.settings
     content {
       namespace = "aws:elasticbeanstalk:application:environment"
-      name = setting.value["name"]
-      value = setting.value["value"]
+      name      = setting.value["name"]
+      value     = setting.value["value"]
     }
   }
 }

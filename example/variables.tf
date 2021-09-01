@@ -30,6 +30,10 @@ variable "rds_allocated_storage" {
 variable "rds_instance_class" {
 }
 
+# elastic_redis module variables
+variable "redis_node_type" {
+}
+
 # elasticbeanstalk module variables
 variable "app_version" {
 }

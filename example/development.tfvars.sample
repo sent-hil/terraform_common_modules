@@ -10,5 +10,7 @@ rds_database_password = ""
 rds_allocated_storage = 100
 rds_instance_class = "db.t2.micro"
 
+redis_node_type = "cache.t2.micro"
+
 app_version = ".zip"
 app_path = "../"

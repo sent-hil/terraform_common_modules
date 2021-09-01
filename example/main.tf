@@ -26,6 +26,21 @@ module "rds_postgres" {
   vpc_public_subnet_cidr_block = module.vpc.public_subnet.cidr_block
 }
 
+module "elastic_redis" {
+  source = "/Users/senthil/play/terraform-common-modules/elastic_redis"
+
+  aws_region       = var.aws_region
+  aws_profile_name = var.aws_profile_name
+  project          = var.project
+
+  vpc_id                       = module.vpc.vpc_id
+  private_subnet_id_1          = module.vpc.private_subnet_id_1
+  private_subnet_id_2          = module.vpc.private_subnet_id_2
+  vpc_public_subnet_cidr_block = module.vpc.public_subnet.cidr_block
+
+  redis_node_type = var.redis_node_type
+}
+
 module "elasticbeanstalk" {
   source = "../elasticbeanstalk"
 
