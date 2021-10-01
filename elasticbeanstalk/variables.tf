@@ -29,7 +29,7 @@ variable "app_path" {
 // $ aws elasticbeanstalk list-available-solution-stacks
 variable "eb_solution_stack_name" {
   description = "EB Solution Stack."
-  default     = "64bit Amazon Linux 2 v3.4.4 running Docker"
+  default     = "64bit Amazon Linux 2 v3.4.5 running Docker"
 }
 
 variable "eb_instance_type" {
